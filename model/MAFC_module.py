@@ -32,18 +32,15 @@ class SpatialGate_new1(nn.Module):
         self.convdw = nn.Conv2d(
                 in_channels=cout,
                 out_channels=cout,
-                kernel_size=3,
+                kernel_size=7,
                 stride=1,
-                padding=1,
+                padding=3,
                 groups=cout,
                 bias=False)
         self.gate_s.add_module('gate_s_conv_depthwise',self.convdw)
         self.gate_s.add_module('gate_s_bn0',nn.BatchNorm2d(cout))
         self.gate_s.add_module('gate_s_relu0',nn.ReLU())
         self.gate_s.add_module('gate_s_conv_reduce', nn.Conv2d(cout, 1, kernel_size=1))
-
-
-
 
     def forward(self, in_tensor):
         x_gate_s = self.gate_s( in_tensor )
