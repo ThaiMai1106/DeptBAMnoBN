@@ -25,8 +25,8 @@ class ChannelGate(nn.Module):
 
 class SpatialGate_new1(nn.Module):
     def __init__(self, gate_channel, reduction_ratio=8):
-        super(SpatialGate_new1, self).__init__()
-        cout=gate_channel//reduction_ratio
+        super(SpatialGate_new1_NoBN, self).__init__()
+        cout = gate_channel // reduction_ratio
         self.gate_s = nn.Sequential()
         self.gate_s.add_module('gate_s_conv_reduce0', nn.Conv2d(gate_channel, cout, kernel_size=1))
         self.convdw = nn.Conv2d(
@@ -36,14 +36,14 @@ class SpatialGate_new1(nn.Module):
                 stride=1,
                 padding=3,
                 groups=cout,
-                bias=False)
-        self.gate_s.add_module('gate_s_conv_depthwise',self.convdw)
-        self.gate_s.add_module('gate_s_bn0',nn.BatchNorm2d(cout))
-        self.gate_s.add_module('gate_s_relu0',nn.ReLU())
+                bias=True)  # Đổi bias=True khi bỏ BN
+        self.gate_s.add_module('gate_s_conv_depthwise', self.convdw)
+        # Bỏ BN
+        self.gate_s.add_module('gate_s_relu0', nn.ReLU())
         self.gate_s.add_module('gate_s_conv_reduce', nn.Conv2d(cout, 1, kernel_size=1))
-
+    
     def forward(self, in_tensor):
-        x_gate_s = self.gate_s( in_tensor )
+        x_gate_s = self.gate_s(in_tensor)
         return x_gate_s
 class BAM(nn.Module):
     def __init__(self, gate_channel):
